@@ -1,0 +1,152 @@
+---
+title: "CLT Assignment"
+author: "Zhitian Liu"
+date: "03/03/2021"
+output:
+  html_document:
+    df_print: paged
+---
+
+## Problem 1
+A machine produces rope at a mean rate of mean of 4 feet per minute with standard deviation of 5 inches. Assume that the amounts produced in different minutes are independent and identically distributed, approximate the probability that the machine will produce at least 250 feet in one hour.
+
+```{r}
+#some calculations needed 
+options(scipen = 999)
+(250-4*60)/(sqrt(60)*(5/12))
+p=1-pnorm((250-4*60)/(sqrt(60)*(5/12)))
+p
+```
+Answer: 
+We define $V$ is the total rope length produced in 1 hour
+We are given n=60, $\mu=4$feet,$\sigma=5$inches, which is 5/12 feet, from the CLT, $Z=\frac{V-\mu*n}{\sqrt{\sigma^2*n}}$
+so we can do the following computation
+$$
+\begin{equation}\begin{split}
+P\{V>250\}&=P\{\frac{V-4*60}{\sqrt{60}*5/12}>\frac{250-4*60}{\sqrt{60}*5/12}\}\\
+&=P\{\frac{V-4*60}{\sqrt{60}*5/12}>3.10\}\\
+&=1-P\{\frac{V-4*60}{\sqrt{60}*5/12}<3.10\}\\
+&=1-\Phi(3.1)\\
+&=0.001
+
+\end{split}\end{equation}
+$$
+
+## Problem 2
+Assume that the distribution of the number of defects on any given bolt of cloth is the Poisson distribution with mean 5, and the number of defects on each bolt is counted for a random sample of 125 bolts. Determine the probability that the average number of defects per bolt in the sample will be less than 5.5 defects per bolt.
+```{r}
+#some calculations needed 
+(687.5-125*5)/(sqrt(125)*sqrt(5))
+p=pnorm(2.5)
+p
+```
+
+Answer:
+From the given information, we can see that $\mu=\sigma^2=5$, the probability that the average number of defects per bolt in the sample will be less than 5.5 defects per bolt is equals to the probability that total defects in 125 plots is less than 687.5
+from the CLT, $Z=\frac{V-\mu*n}{\sqrt{\sigma^2*n}}$
+so we can do the following computation
+
+$$
+\begin{equation}\begin{split}
+P\{V<687.5\}&=P\{\frac{V-125*5}{\sqrt{125}*\sqrt5}>\frac{687.5-125*5}{\sqrt{125}*\sqrt5}\\
+&=P\{\frac{V-125*5}{\sqrt{125}*\sqrt5}<2.5\}\\
+&=\Phi(2.5)\\
+&=0.9938
+
+\end{split}\end{equation}
+$$
+
+
+
+
+
+
+## Problem 3
+Suppose that the proportion of defective items in a large manufactured lot is 0.1. What is the smallest random sample of items that must be taken from the lot in order for the probability to be at least 0.99 that the proportion of defective items in the sample will be less than 0.13?
+```{r}
+#some calculations needed 
+qnorm(0.99)
+(qnorm(0.99)*10)^2
+```
+
+Answer:
+Let $X_i=1$ if an item is defective, otherwise $x_i=0$. Let V be the proportion of defective items in the sample. $V=\frac{1}{n}\sum\left ( x_i \right )$, what we need here is $P\{V<0.13\}>0.99$
+We notice that $X_i=1$ follows a Bernoulli distribution is p=0.1, Hence $\mu=0.1,\sigma^2=0.1*0.9=0.09$, from the CLT, we can do the fllowing calculation
+$$
+\begin{equation}\begin{split}
+P\{V<0.13\}&=P\{\frac{\sqrt{n}(V-\mu)}{\sigma} <  \frac{\sqrt{n}(0.13-0.1)}{0.09}   \}\\
+&=P\{Z<\frac{0.03\sqrt{n}}{0.3}\}\\
+&=P\{Z<\frac{\sqrt{n}}{10}\}=0.99\\
+\Phi(2.3263)=0.99;\\
+&\frac{\sqrt{n}}{10}>2.3263, n>=541.19=542\\
+
+
+\end{split}\end{equation}
+
+
+
+
+
+
+$$
+
+Hence, we unless need 542 samples.
+
+  
+## Problem 4
+Suppose that 16 digits are chosen at random with replacement from the set 0, . . . , 9. What is the probability that their average will lie between 4 and 6?
+```{r}
+(64-16*4.5)/sqrt(16*8.25)
+(96-16*4.5)/sqrt(16*8.25)
+pnorm(2.089)-pnorm(-0.696)
+```
+
+Answer: Assume  $X_i$ be one sample selected from 10 numbers, We can easily get E(X)=4.5, Var(X)=8.25, Let $V=\sum_{i=1}^nX_i$ be the total value selected 
+We want to know $P\{64<V<96\}$, From CLT
+
+$$
+\begin{equation}\begin{split}
+P\{64<V<96\}&=P\{ \frac{64-16*4.5}{\sqrt{16*8.25}} <  \frac{V-16*4.5}{\sqrt{16*8.25}}< \frac{96-16*4.5}{\sqrt{16*8.25}}\}\\
+&=P\{ -0.696<Z<2.089\}\\
+&=\Phi(2.089)-\Phi(-0.696)\\
+&=0.738
+
+
+
+\end{split}\end{equation}
+$$
+
+
+
+
+
+
+
+
+## Problem 5
+Select a skewed distribution from which to sample. Using R, demonstrate the
+convergence of the mean value of your samples to the Normal distribution. Assume you are making
+this demonstration to someone who has little or no statistical training. Your demonstration should
+take no more than 10 minutes. Along with your code, outline the commentary you would use in
+your demonstration.
+
+
+```{r}
+x=numeric()
+for(i in 1:100){
+  #simulate samples from gama(2,2) and calculate the mean.
+x[i]=mean(rgamma(10000,2,2))
+}
+y1=x[1:5]
+y2=x[1:15]
+y3=x
+
+plot(density(y1),lwd=2,col="red",main="density of 5 mean values of the sample selected from gamma distribution")
+
+plot(density(y2),lty=2,lwd=2,col="blue",main="density of 15 mean values of the sample selected from gamma distribution")
+plot(density(y3),lty=2,lwd=4,col="yellow",main="density of 100 mean values of the sample selected from gamma distribution")
+
+```
+
+We use gamma(2,2) as the skewed distribution we use to simulate samples. For each time, we simulate 10000 samples and calculate mean values of these samples. And then, we plot these mean value(showing above)
+By reading these plots one by one, we can see that as the number of mean values increase, the density of these mean values tends to be a normal distribution.
